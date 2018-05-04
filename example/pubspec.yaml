@@ -1,11 +1,13 @@
 name: piechart
-description: A new Flutter project.
+description: A RotationDetector example.
+version: 1.0.0
+author: Diogo Nunes
+homepage: https://github.com/d13nunes/flutter_rotation_detector
 
 dependencies:
   flutter:
     sdk: flutter
-  rotation_detector:
-    path: ../../
+  rotation_detector: any
   flutter_circular_chart: "^0.0.2"
   
   # The following adds the Cupertino Icons font to your application.
