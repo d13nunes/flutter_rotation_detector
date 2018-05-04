@@ -1,9 +1,10 @@
 name: rotation_detector
-description: A new flutter package project.
-version: 0.0.1
-author:
-homepage:
-
+description: A widget that gives rotation behavior to a circular child widget
+version: 1.0.2
+author: Diogo Nunes <d13nunes@gmail.com>
+homepage: https://github.com/d13nunes/flutter_rotation_detector
+environment:
+  sdk: "<=2.0.0-edge.c080951d45e79cd25df98036c4be835b284a269c"
 dependencies:
   flutter:
     sdk: flutter
