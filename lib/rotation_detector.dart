@@ -12,7 +12,6 @@
 
 library rotation_detector;
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
@@ -24,15 +23,11 @@ class RotationDetector extends StatefulWidget {
   RotationDetector({this.child, this.width, this.height});
 
   @override
-  _RotationDetector createState() => new _RotationDetector();
+  _RotationDetectorState createState() => new _RotationDetectorState();
 }
 
-class _RotationDetector extends State<RotationDetector>
-    with SingleTickerProviderStateMixin {
+class _RotationDetectorState extends State<RotationDetector> {
   double angle = 0.0;
-
-  Offset lastPan = Offset.zero;
-  AnimationController flingAnimation;
 
   @override
   Widget build(BuildContext context) {
@@ -49,85 +44,14 @@ class _RotationDetector extends State<RotationDetector>
   void onPanUpdate(DragUpdateDetails pan) {
     RenderBox box = context.findRenderObject();
     var localOffset = box.globalToLocal(pan.globalPosition);
-    var converted = _normalizeAngle(localOffset);
-    var px = converted.dx;
-    var py = converted.dy;
-    if (pan.delta.dx == 0.0 && pan.delta.dy == 0.0) {
-      return;
-    }
-    var angle1 = _getAngle(px, py);
-    var angle2 = _getAngle(px + pan.delta.dx, py + pan.delta.dy);
 
-    var deltaAngle = (angle1 - angle2);
+    var x = localOffset.dx - box.size.width / 2;
+    var y = localOffset.dy - box.size.height / 2;
+    var dx = x + pan.delta.dx;
+    var dy = y + pan.delta.dy;
 
-    var q = _getQuadrant(localOffset);
-    double nAngle = 0.0;
-    switch (q) {
-      case _CircleQuadrant.III:
-      case _CircleQuadrant.II:
-        nAngle = angle + deltaAngle;
-        break;
-      case _CircleQuadrant.I:
-      case _CircleQuadrant.IV:
-        nAngle = angle - deltaAngle;
-        break;
-      default:
-        break;
-    }
-    setState(() => angle = nAngle);
-  }
+    var deltaAngle = atan2(dy, dx) - atan2(y, x);
 
-  double _getAngle(double px, double py) {
-    var a = sqrt(pow(px, 2) + pow(py, 2));
-    var b = px;
-    if (a == 0) return 0.0;
-    return asin(b / a);
-  }
-
-  Offset _normalizeAngle(Offset offset) {
-    var width = widget.width;
-    var height = widget.height;
-
-    var px = offset.dx;
-    var py = offset.dy;
-
-    var quadrante = _getQuadrant(offset);
-    switch (quadrante) {
-      case _CircleQuadrant.I:
-        return offset;
-        break;
-      case _CircleQuadrant.II:
-        return Offset(px, py - height);
-        break;
-      case _CircleQuadrant.III:
-        return Offset(px - width, py - height);
-        break;
-      case _CircleQuadrant.IV:
-        return Offset(px - width, py);
-        break;
-      default:
-        return Offset.zero;
-    }
-  }
-
-  _CircleQuadrant _getQuadrant(Offset offset) {
-    var ox = widget.width / 2;
-    var oy = widget.height / 2;
-    var px = offset.dx;
-    var py = offset.dy;
-    if (px < ox && py < oy) {
-      return _CircleQuadrant.I;
-    } else if (px < ox && py >= oy) {
-      return _CircleQuadrant.II;
-    } else if (px >= ox && py >= oy) {
-      return _CircleQuadrant.III;
-    } else if (px > ox && py < oy) {
-      return _CircleQuadrant.IV;
-    } else {
-      assert(false);
-      return null;
-    }
+    setState(() => angle += deltaAngle);
   }
 }
-
-enum _CircleQuadrant { I, II, III, IV }
